@@ -1,6 +1,6 @@
 use gpui::{
-    App, Application, Bounds, Pixels, Size, TitlebarOptions, WindowBackgroundAppearance,
-    WindowBounds, WindowKind, WindowOptions, px,
+    App, Application, Bounds, KeyBinding, Pixels, Size, TitlebarOptions,
+    WindowBackgroundAppearance, WindowBounds, WindowKind, WindowOptions, actions, px,
 };
 
 use crate::{
@@ -21,9 +21,12 @@ const MIN_WINDOW_SIZE: Size<Pixels> = Size {
 
 const APP_TITLE: &str = "GPUI Calculator";
 
+actions!(gpui, [Quit]);
+
 pub fn run() {
     Application::new().with_assets(Assets).run(|app: &mut App| {
         app.set_global(Theme::default());
+        app.bind_keys([KeyBinding::new("cmd-w", Quit, None)]);
         Assets.load_fonts(app).expect("failed to load fonts");
         StateEntity::build(app);
         set_keybinds(app);
@@ -52,6 +55,11 @@ pub fn run() {
         app.open_window(window_options, Root::build)
             .expect("failed to open window");
 
+        app.on_action(quit);
         app.activate(true);
     });
+}
+
+fn quit(_: &Quit, cx: &mut App) {
+    cx.quit();
 }
